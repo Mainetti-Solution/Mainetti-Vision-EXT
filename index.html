@@ -1,0 +1,553 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mainetti Vision: EXT</title>
+
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.png" type="image/png">
+  <meta name="theme-color" content="#0b0c10">
+
+  <style>
+    /* STILE EXT: Tema Scuro con accenti ARANCIONI (Vendita) */
+    :root { 
+      --bg:#0b0c10; 
+      --card:#111318; 
+      --muted:#9aa4b2; 
+      --txt:#e8edf2; 
+      --acc:#f97316; /* ARANCIONE EXT */
+      --bad:#ff4f4f; 
+      --ok:#4ade80; 
+    }
+    
+    *{ box-sizing:border-box; }
+    body{ margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; background:linear-gradient(180deg,#0b0c10,#0a0b0f); color:var(--txt); padding-bottom:50px; }
+    
+    /* HERO HEADER EXT */
+    header.hero{ padding: 30px 16px 20px; border-bottom: 1px solid #1b1f2a; position: sticky; top: 0; z-index: 10; backdrop-filter: blur(10px); background: rgba(11,12,16,.9); }
+    .hero-inner{ max-width: 1100px; margin: 0 auto; text-align: center; }
+    
+    .hero-title{ font-size: 32px; letter-spacing: 2px; font-weight: 800; text-transform: uppercase; color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+    .hero-line{ width: 100%; max-width: 400px; height: 3px; background: linear-gradient(90deg, transparent, var(--acc), transparent); margin: 10px auto; border-radius: 99px; }
+    .hero-sub{ font-size: 14px; letter-spacing: 1px; color: #9aa4b2; text-transform:uppercase; font-weight:600;}
+    
+    main{ max-width:1100px; margin:0 auto; padding:16px; display:grid; gap:14px; grid-template-columns: 1fr; } /* Colonna singola per semplicità su mobile */
+    @media (min-width: 768px){ main{ grid-template-columns: 1.15fr .85fr; } }
+    
+    .card{ background: rgba(17,19,24,.95); border:1px solid #1b1f2a; border-radius:14px; padding:16px; box-shadow: 0 10px 30px rgba(0,0,0,.3); }
+    .card h2{ margin:0 0 15px 0; font-size:14px; text-transform:uppercase; letter-spacing:1px; color:var(--acc); border-left: 3px solid var(--acc); padding-left: 10px; }
+    
+    .row{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    @media (max-width: 560px){ .row{ grid-template-columns:1fr; } }
+    
+    label{ display:block; font-size:12px; color:var(--muted); margin-bottom:6px; font-weight:500;}
+    input, select, textarea{ width:100%; padding:12px; border-radius:10px; border:1px solid #242a38; background:#0d1017; color:var(--txt); outline:none; font-size:14px; transition:.2s;}
+    input:focus, select:focus, textarea:focus{ border-color:var(--acc); box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.1); }
+    textarea{ min-height: 85px; resize:vertical; font-family:inherit; }
+    
+    /* MATERIALI STYLE EXTENDED */
+    .mat-input-group { display:grid; grid-template-columns: 0.5fr 0.5fr 2fr 1fr 0.5fr; gap:8px; align-items:end; background: #0d1017; padding:10px; border-radius:10px; border:1px solid #242a38; }
+    @media (max-width: 600px){ .mat-input-group{ grid-template-columns: 1fr 1fr; } .mat-input-group input:nth-child(3){ grid-column: span 2; } .mat-input-group button{ grid-column: span 2; } }
+    
+    .mat-list-item { display:flex; justify-content:space-between; align-items:center; padding:8px 10px; border-bottom:1px solid #242a38; background:rgba(255,255,255,0.02); margin-top:5px; border-radius:6px; font-size:13px;}
+    .mat-list-item span { color: var(--acc); font-weight:bold; margin-right:10px; }
+    .mat-price { color: #888; margin-left: auto; margin-right: 15px; font-size:12px; }
+
+    .sep{ height:1px; background:#1b1f2a; margin:16px 0; }
+    .btns{ display:flex; flex-wrap:wrap; gap:10px; }
+    button{ border:0; border-radius:12px; padding:12px 16px; cursor:pointer; background: #1a2233; color:var(--txt); border:1px solid #26304a; font-weight:600; font-size:14px; transition:.2s;}
+    button:hover{ filter:brightness(1.1); }
+    
+    button.primary{ background: linear-gradient(180deg,var(--acc),#ea580c); border:none; color:#fff; box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3); }
+    button.whatsapp{ background: #25D366; border:none; color:#fff; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3); }
+    button.ok{ background: #14251f; border-color:#1f4b3c; color:#d8fff1; }
+    button.danger{ background: #2a1717; border-color:#512121; color:#ffd7d7; }
+    button.add-btn { background: var(--acc); color:#fff; font-weight:bold; height:42px;}
+    button:disabled{ opacity:.5; cursor:not-allowed; box-shadow:none; }
+    
+    .sigbox{ display:grid; gap:10px; margin-top:10px; padding:10px; border:1px solid #242a38; border-radius:10px; background:#14161c; }
+    canvas{ width:100%; height:140px; border-radius:12px; border:1px dashed #2a3143; background:#0d1017; touch-action:none;}
+    .hidden{ display:none !important; }
+
+    /* PDF PRINT STYLE */
+    #printWrap{ position: fixed; left: -10000px; top: 0; width: 794px; background: white; color: #333; padding: 40px; font-family: 'Segoe UI', Arial, sans-serif; }
+    #printWrap h1 { color: #111; border-bottom: 3px solid #f97316; padding-bottom: 10px; font-size: 24px; margin-bottom: 5px; text-transform: uppercase;}
+    #printWrap h3 { background: #fff7ed; padding: 6px 10px; color: #9a3412; font-size: 14px; border-left: 4px solid #f97316; margin-top: 25px; font-weight:bold; }
+    
+    #printWrap .p-row { display: flex; margin-bottom: 8px; font-size: 12px; border-bottom: 1px solid #f0f0f0; padding-bottom: 4px; }
+    #printWrap .p-label { width: 140px; font-weight: bold; color: #444; }
+    #printWrap .p-val { flex-grow: 1; color: #000; font-family: 'Courier New', monospace; font-weight:600;}
+    
+    #printWrap .p-table { width:100%; border-collapse: collapse; margin-top:10px; font-size:12px; }
+    #printWrap .p-table th { background: #fff7ed; border:1px solid #ccc; padding:6px; text-align:left; font-size:11px;}
+    #printWrap .p-table td { border:1px solid #eee; padding:6px; color:#333; }
+    #printWrap .p-table tr:nth-child(even) { background: #fafafa; }
+
+    #printWrap .sig-area { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 50px; }
+    #printWrap .sig-block { border: 1px solid #ccc; padding: 10px; height: 140px; position: relative; background:#fff; }
+    #printWrap .sig-block strong { font-size: 11px; display: block; border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 5px; text-transform:uppercase; color:#666; }
+    #printWrap .sig-img { max-height: 90px; max-width: 100%; display: block; margin: 0 auto; }
+    
+    #printWrap footer { margin-top: 50px; text-align: center; font-size: 10px; color: #999; border-top: 1px solid #eee; padding-top: 15px; }
+
+    #toast{ position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#111; border:1px solid var(--acc); padding:12px 24px; border-radius:99px; color:#fff; font-size:14px; opacity:0; transition:.3s; pointer-events:none; z-index:1000; font-weight:bold; box-shadow:0 5px 20px rgba(0,0,0,0.5);}
+    #toast.show{ opacity:1; transform:translateX(-50%) translateY(-10px); }
+    
+    .hist-item{ display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #222; transition:.2s; background: rgba(255,255,255,0.02); margin-bottom:6px; border-radius:8px;}
+    .hist-item:hover{ background: rgba(249, 115, 22, .08); }
+    .hist-info{ flex-grow:1; padding:12px; cursor:pointer; }
+    .hist-del{ padding:12px 16px; cursor:pointer; font-size:16px; background:transparent; border:none; color:#666; transition:.2s; border-left:1px solid #222; border-radius:0 8px 8px 0;}
+    .hist-del:hover{ color:#ff4f4f; background: rgba(255, 79, 79, 0.15); }
+    
+    .power { text-align:center; font-size:11px; color:var(--muted); margin-top:20px; opacity:0.6; }
+  </style>
+</head>
+
+<body>
+<header class="hero">
+  <div class="hero-inner">
+    <div class="hero-title">MAINETTI VISION: EXT</div>
+    <div class="hero-line"></div>
+    <div class="hero-sub">Vendita & Ordini Materiale</div>
+  </div>
+</header>
+
+<main>
+  <section class="card" id="formCard">
+    <h2>1) Dati Cliente</h2>
+    
+    <div style="margin-bottom:12px">
+      <label>Rif. Ordine / ID Interno</label>
+      <input id="missionId" placeholder="Es: ORD-2026-001" />
+    </div>
+
+    <div class="row">
+      <div><label>Ragione Sociale / Cliente</label><input id="clientName" placeholder="Es: Rossi S.r.l." /></div>
+      <div><label>Data Ordine</label><input id="date" type="date" /></div>
+    </div>
+
+    <div style="margin-top:12px"><label>Indirizzo di Consegna/Sede</label><input id="address" placeholder="Via Roma 1, Milano" /></div>
+    <div style="margin-top:12px"><label>Referente / Contatto</label><input id="contact" placeholder="Nome cognome referente" /></div>
+
+    <div class="sep"></div>
+    <h2>2) Lista Materiali / Prodotti</h2>
+    <div class="mat-input-group">
+        <div>
+            <label>Q.tà</label>
+            <input type="number" id="matQty" placeholder="1" />
+        </div>
+        <div>
+            <label>Unità</label>
+            <select id="matUnit">
+                <option value="pz">pz</option>
+                <option value="ml">ml</option>
+                <option value="kg">kg</option>
+                <option value="scatole">box</option>
+            </select>
+        </div>
+        <div>
+            <label>Articolo / Descrizione</label>
+            <input id="matName" placeholder="Es: Kit Videosorveglianza..." />
+        </div>
+        <div>
+            <label>Prezzo Unit.</label>
+            <input type="number" id="matPrice" placeholder="CHF" step="0.01" />
+        </div>
+        <button class="add-btn" onclick="addMaterial()">+</button>
+    </div>
+    <div style="font-size:11px; color:#666; margin-top:5px; text-align:right">* Prezzo opzionale</div>
+    <div id="materialsList" style="margin-top:10px;"></div>
+
+    <div class="sep"></div>
+    <h2>3) Note & Consegna</h2>
+    <div>
+      <label>Metodo Consegna / Ritiro</label>
+      <select id="type">
+        <option value="Consegna Diretta">🚚 Consegna Diretta</option>
+        <option value="Ritiro in Sede">🏢 Ritiro in Sede</option>
+        <option value="Spedizione Corriere">📦 Spedizione Corriere</option>
+        <option value="Altro">Altro</option>
+      </select>
+    </div>
+    <div style="margin-top:12px">
+      <label>Note Aggiuntive</label>
+      <textarea id="notes" placeholder="Note per l'amministrazione o magazzino..."></textarea>
+    </div>
+
+    <div class="sep"></div>
+    <div class="btns" id="editBtns">
+      <button class="ok" id="saveDraft">💾 Salva Bozza</button>
+      <button class="danger" id="reset">❌ Pulisci</button>
+    </div>
+  </section>
+
+  <aside class="card">
+    <h2>Conferma Ordine</h2>
+    
+    <h3>Firma Collaboratore / Venditore</h3>
+    <div class="row">
+      <div><label>Nome Collaboratore</label><input id="opName" value="" placeholder="Il tuo nome" /></div>
+    </div>
+    <div class="sigbox" id="opSigDrawBox">
+      <canvas id="opCanvas"></canvas>
+      <button onclick="clearCanvas('opCanvas')" style="padding:4px 10px; font-size:11px;">Cancella</button>
+    </div>
+
+    <div class="sep"></div>
+    <h3>Firma Cliente (Per Accettazione)</h3>
+    <div class="row">
+      <div><label>Nome Cliente</label><input id="clName" placeholder="Chi firma?" /></div>
+    </div>
+    <div class="sigbox" id="clSigDrawBox">
+      <canvas id="clCanvas"></canvas>
+      <button onclick="clearCanvas('clCanvas')" style="padding:4px 10px; font-size:11px;">Cancella</button>
+    </div>
+    
+    <div class="sep"></div>
+    <div class="pill" style="cursor:default">
+      <input type="checkbox" id="privacy" checked disabled />
+      <label for="privacy" style="font-size:11px; color:#888; cursor:default">Il cliente accetta l'ordine e le condizioni di vendita.</label>
+    </div>
+
+    <div class="sep"></div>
+    <div class="btns">
+      <button class="primary" id="finalize" style="width:100%; padding:15px;">✅ CONFERMA ORDINE</button>
+      
+      <button id="waBtn" disabled class="whatsapp" style="width:100%">📲 Invia Ordine WhatsApp</button>
+      
+      <button id="pdfBtn" disabled style="width:100%">📄 Scarica PDF Ordine</button>
+    </div>
+
+    <div class="sep"></div>
+    <h2>Storico Ordini</h2>
+    <div id="history" class="mini" style="margin-top:10px"></div>
+    
+    <div style="margin-top:20px;">
+        <button id="exitView" class="danger hidden" style="width:100%">Chiudi Visualizzazione</button>
+    </div>
+
+    <div class="power">Powered by <b>Mainetti Solution</b></div>
+  </aside>
+</main>
+
+<div id="printWrap">
+  <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 2px solid #f97316; padding-bottom:10px; margin-bottom:20px;">
+     <div>
+         <h1 style="border:none; margin:0; padding:0;">ORDINE MATERIALE</h1>
+         <div style="font-size:12px; color:#666; margin-top:5px;">MAINETTI VISION: EXT - Sales Order</div>
+     </div>
+  </div>
+  
+  <h3>1. DATI CLIENTE</h3>
+  <div class="p-row" id="p_mid_row"><div class="p-label">Rif. Ordine:</div><div class="p-val" id="p_mid"></div></div>
+  <div class="p-row"><div class="p-label">Cliente:</div><div class="p-val" id="p_client"></div></div>
+  <div class="p-row"><div class="p-label">Indirizzo:</div><div class="p-val" id="p_addr"></div></div>
+  <div class="p-row"><div class="p-label">Referente:</div><div class="p-val" id="p_contact"></div></div>
+  <div class="p-row"><div class="p-label">Data:</div><div class="p-val" id="p_date"></div></div>
+
+  <h3>2. DETTAGLIO ARTICOLI</h3>
+  <table class="p-table">
+      <thead><tr><th style="width:10%">Q.tà</th><th style="width:10%">Unità</th><th>Articolo / Descrizione</th><th style="width:15%">Prezzo Unit.</th></tr></thead>
+      <tbody id="p_materials_list"></tbody>
+  </table>
+
+  <h3>3. NOTE E CONSEGNA</h3>
+  <div class="p-row"><div class="p-label">Modalità:</div><div class="p-val" id="p_type"></div></div>
+  <div class="p-row"><div class="p-label">Note:</div><div class="p-val" id="p_notes"></div></div>
+
+  <div class="sig-area">
+    <div class="sig-block">
+      <strong>Collaboratore Mainetti</strong>
+      <div id="p_op_sig_img"></div>
+      <div style="font-size:10px; margin-top:5px; text-align:center" id="p_op_name"></div>
+    </div>
+    <div class="sig-block">
+      <strong>Cliente (Per Accettazione)</strong>
+      <div id="p_cl_sig_img"></div>
+      <div style="font-size:10px; margin-top:5px; text-align:center" id="p_cl_name"></div>
+    </div>
+  </div>
+
+  <footer>
+    Mainetti Solution - Ordine Materiale (EXT).<br>
+    Documento valido come conferma d'ordine.
+  </footer>
+</div>
+
+<div id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    // Optional: window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js'));
+  }
+
+  const STORAGE_KEY = "ms_ext_v1_data";
+  
+  const $ = (id) => document.getElementById(id);
+  const toast = (msg) => {
+    const t = $("toast"); t.textContent = msg; t.classList.add("show");
+    setTimeout(()=>t.classList.remove("show"), 3000);
+  };
+  function nowISO(){ return new Date().toISOString(); }
+  function uid(){ return 'ext_' + Date.now().toString(36); }
+  function loadAll(){ try{ return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"); } catch{ return []; } }
+  function saveAll(arr){ localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); }
+  function fmtDate(iso){ if(!iso || iso.indexOf("-")===-1) return iso; const p=iso.split("-"); return `${p[2]}.${p[1]}.${p[0]}`; }
+
+  // --- MATERIAL LOGIC ---
+  let materials = [];
+  
+  window.addMaterial = () => {
+      const q = $("matQty").value;
+      const u = $("matUnit").value;
+      const n = $("matName").value;
+      const p = $("matPrice").value;
+      
+      if(!q || !n) return toast("Inserisci quantità e nome!");
+      
+      materials.push({ q, u, n, p });
+      $("matQty").value = ""; $("matName").value = ""; $("matPrice").value = "";
+      renderMaterials();
+  }
+
+  window.removeMaterial = (index) => {
+      materials.splice(index, 1);
+      renderMaterials();
+  }
+
+  function renderMaterials() {
+      const el = $("materialsList");
+      el.innerHTML = "";
+      materials.forEach((m, i) => {
+          const div = document.createElement("div");
+          div.className = "mat-list-item";
+          const priceTxt = m.p ? `CHF ${m.p}` : "";
+          div.innerHTML = `<div><span>${m.q} ${m.u}</span> ${m.n}</div> <div class="mat-price">${priceTxt}</div> <button style="padding:4px 8px; font-size:12px; background:#2a1717; color:#ffbaba" onclick="removeMaterial(${i})">X</button>`;
+          el.appendChild(div);
+      });
+  }
+
+  // --- CANVAS ---
+  const pads = {};
+  function initPad(id){
+    const c = $(id);
+    const ctx = c.getContext("2d");
+    let drawing = false, storedImage = null;
+    function resize(){
+      const r = c.getBoundingClientRect();
+      if(r.width === 0) return;
+      c.width = r.width; c.height = r.height;
+      ctx.lineWidth = 2; ctx.strokeStyle = "#e8edf2";
+      if(storedImage) ctx.drawImage(storedImage, 0, 0, c.width, c.height);
+    }
+    window.addEventListener("resize", resize);
+    function getPos(e){ const r=c.getBoundingClientRect(), t=e.touches?e.touches[0]:e; return { x: t.clientX - r.left, y: t.clientY - r.top }; }
+    c.addEventListener("mousedown", e => { drawing=true; ctx.beginPath(); ctx.moveTo(getPos(e).x, getPos(e).y); });
+    c.addEventListener("mousemove", e => { if(drawing){ const p=getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); }});
+    window.addEventListener("mouseup", () => drawing=false);
+    c.addEventListener("touchstart", e => { e.preventDefault(); drawing=true; ctx.beginPath(); ctx.moveTo(getPos(e).x, getPos(e).y); }, {passive:false});
+    c.addEventListener("touchmove", e => { if(drawing){ e.preventDefault(); const p=getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); }}, {passive:false});
+    pads[id] = { canvas:c, ctx:ctx, resize:resize, setImg:(img)=>{storedImage=img; resize();}, clearImg:()=>{storedImage=null;}, isEmpty:()=>!ctx.getImageData(0,0,c.width,c.height).data.some(x=>x!==0) };
+    setTimeout(resize, 500);
+  }
+  initPad("opCanvas"); initPad("clCanvas");
+
+  window.clearCanvas = (id) => { pads[id].clearImg(); pads[id].ctx.clearRect(0,0,pads[id].canvas.width,pads[id].canvas.height); };
+  window.drawFromUrl = (id, url) => { if(!url)return; const img=new Image(); img.onload=()=>pads[id].setImg(img); img.src=url; };
+  function getSigData(prefix){
+    return { type:"draw", val: pads[prefix+"Canvas"].canvas.toDataURL(), empty: pads[prefix+"Canvas"].isEmpty() };
+  }
+
+  // --- DATA LOGIC ---
+  let currentId = null;
+
+  function toggleForm(enable){
+    document.querySelectorAll("input, select, textarea, button.add-btn").forEach(el => el.disabled = !enable);
+    $("editBtns").classList.toggle("hidden", !enable);
+    $("finalize").classList.toggle("hidden", !enable);
+  }
+
+  function getData(){
+    // MAPPATURA PER COMPATIBILITA CON IL TOOL DI FATTURAZIONE
+    // job.desc diventa "Note" per l'admin
+    // job.type diventa la modalità consegna
+    return {
+      client: { name: $("clientName").value, addr: $("address").value, contact: $("contact").value },
+      job: { 
+          missionId: $("missionId").value, 
+          date: $("date").value, 
+          loc: "Vendita Esterna", // Fisso per riconoscerlo
+          type: $("type").value, 
+          desc: $("notes").value 
+      },
+      materials: materials,
+      result: { outcome: "Ordine Confermato", notes: "" } // Placeholder
+    };
+  }
+
+  $("saveDraft").onclick = () => {
+    const rec = { id: currentId||uid(), status: "draft", timestamp: nowISO(), data: getData(), sigs: {} };
+    const all = loadAll();
+    const idx = all.findIndex(x=>x.id===rec.id);
+    if(idx>=0) all[idx]=rec; else all.unshift(rec);
+    saveAll(all); currentId=rec.id; renderHistory(); toast("Bozza salvata!");
+  };
+
+  $("finalize").onclick = () => {
+    const d = getData();
+    if(!d.client.name || !d.job.date || materials.length === 0) return toast("Mancano dati (Cliente, Data o Materiali)!");
+    const op=getSigData("op"), cl=getSigData("cl");
+    
+    // Per vendita veloce, la firma cliente potrebbe essere opzionale se ordina via telefono, ma meglio chiedere
+    if(op.empty) return toast("Firma tu come venditore!");
+    
+    const rec = { id: currentId||uid(), status: "signed", timestamp: nowISO(), data: d, sigs: { op: {name:$("opName").value, ...op}, cl: {name:$("clName").value, ...cl} } };
+    const all = loadAll();
+    const idx = all.findIndex(x=>x.id===rec.id);
+    if(idx>=0) all[idx]=rec; else all.unshift(rec);
+    saveAll(all); currentId=rec.id; renderHistory(); toast("Ordine Confermato!");
+    loadRec(rec.id); 
+  };
+
+  $("reset").onclick = () => location.reload();
+  $("exitView").onclick = () => location.reload();
+
+  // --- WHATSAPP EXPORT LOGIC ---
+  $("waBtn").onclick = async () => {
+      const rec = loadAll().find(x=>x.id===currentId);
+      if(!rec) return;
+
+      // 1. Creiamo il file JSON (Importabile nel Tool)
+      const fileName = `ORDINE_${rec.data.client.name.replace(/\s/g,'_')}.json`;
+      const jsonContent = JSON.stringify([rec], null, 2); // Array per compatibilità import
+      const file = new File([jsonContent], fileName, { type: "application/json" });
+
+      // 2. Testo messaggio
+      const text = `📦 *NUOVO ORDINE*\nCliente: ${rec.data.client.name}\nRif: ${rec.data.job.missionId}\n\nAllego il file per l'importazione nel gestionale.`;
+
+      // 3. Uso Web Share API (Mobile)
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          try {
+              await navigator.share({
+                  files: [file],
+                  title: 'Ordine Mainetti Vision',
+                  text: text
+              });
+          } catch (error) {
+              console.log('Sharing failed', error);
+          }
+      } else {
+          // Fallback Desktop: Scarica il file e apri WA Web
+          const a = document.createElement('a');
+          a.href = URL.createObjectURL(new Blob([jsonContent], {type:'application/json'}));
+          a.download = fileName;
+          a.click();
+          
+          toast("File Scaricato! Ora si apre WhatsApp...");
+          setTimeout(() => {
+            window.open(`https://wa.me/?text=${encodeURIComponent(text + "\n(Trascina qui il file scaricato)")}`, '_blank');
+          }, 1500);
+      }
+  };
+
+  // --- PDF GENERATION ---
+  function renderSigHTML(s){
+    if(!s || s.empty) return "";
+    return `<img src="${s.val}" class="sig-img" />`;
+  }
+
+  $("pdfBtn").onclick = () => {
+        const rec = loadAll().find(x=>x.id===currentId);
+        if(!rec) return;
+        const d = rec.data;
+        $("p_mid").textContent = d.job.missionId || "-";
+        $("p_client").textContent = d.client.name; $("p_addr").textContent = d.client.addr; $("p_contact").textContent = d.client.contact || "-";
+        $("p_date").textContent = fmtDate(d.job.date); 
+        $("p_type").textContent = d.job.type;
+        $("p_notes").textContent = d.job.desc || "-"; 
+        
+        const matList = d.materials || [];
+        $("p_materials_list").innerHTML = matList.map(m => `
+            <tr>
+                <td><b>${m.q || ""}</b></td>
+                <td>${m.u || ""}</td>
+                <td>${m.n || ""}</td>
+                <td>${m.p ? 'CHF '+m.p : '-'}</td>
+            </tr>
+        `).join("");
+
+        $("p_op_name").textContent = rec.sigs.op.name; $("p_op_sig_img").innerHTML = renderSigHTML(rec.sigs.op);
+        $("p_cl_name").textContent = rec.sigs.cl.name; $("p_cl_sig_img").innerHTML = renderSigHTML(rec.sigs.cl);
+
+        const el = $("printWrap");
+        html2canvas(el, { scale: 2 }).then(c => {
+          const img = c.toDataURL("image/png");
+          const pdf = new window.jspdf.jsPDF();
+          const w = pdf.internal.pageSize.getWidth();
+          const h = (c.height * w) / c.width;
+          pdf.addImage(img, 'PNG', 0, 0, w, h);
+          pdf.save(`ORDINE_${d.client.name.replace(/\s/g,'_')}.pdf`);
+        });
+  };
+
+  // --- HISTORY ---
+  function renderHistory(){
+    const all = loadAll();
+    all.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+    $("history").innerHTML = all.map(r => `
+      <div class="hist-item">
+        <div class="hist-info" onclick="loadRec('${r.id}')">
+          <b>${r.data.client.name || "Senza nome"}</b><br>
+          <span style="font-size:11px;color:#888">${fmtDate(r.data.job.date)} - ${r.status === 'signed' ? '✅ INVIATO/CHIUSO' : '✏️ BOZZA'}</span>
+        </div>
+        <button class="hist-del" onclick="deleteRec('${r.id}', event)">🗑️</button>
+      </div>
+    `).join("");
+  }
+
+  window.loadRec = (id) => {
+    const r = loadAll().find(x=>x.id===id); if(!r) return;
+    currentId = r.id; const d = r.data;
+    
+    $("missionId").value = d.job.missionId||""; $("clientName").value = d.client.name; $("address").value = d.client.addr;
+    $("contact").value = d.client.contact; $("date").value = d.job.date; 
+    
+    $("type").value = d.job.type; $("notes").value = d.job.desc; 
+    
+    materials = d.materials || [];
+    renderMaterials();
+
+    const isSigned = r.status === "signed";
+    toggleForm(!isSigned);
+    
+    if(isSigned){
+      $("pdfBtn").disabled = false; 
+      $("waBtn").disabled = false;
+      $("exitView").classList.remove("hidden");
+      const op = r.sigs.op, cl = r.sigs.cl;
+      drawFromUrl("opCanvas", op.val);
+      drawFromUrl("clCanvas", cl.val);
+    } else {
+      $("pdfBtn").disabled = true; 
+      $("waBtn").disabled = true;
+      $("exitView").classList.add("hidden");
+      clearCanvas("opCanvas"); clearCanvas("clCanvas");
+    }
+  };
+
+  window.deleteRec = (id, e) => {
+    e.stopPropagation(); if(!confirm("Eliminare ordine?")) return;
+    saveAll(loadAll().filter(x=>x.id!==id)); renderHistory();
+  };
+
+  (function init(){ 
+      $("date").value = new Date().toISOString().split("T")[0]; 
+      renderHistory(); 
+  })();
+</script>
+</body>
+</html>
