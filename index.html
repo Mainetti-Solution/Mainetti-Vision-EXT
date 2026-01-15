@@ -32,7 +32,7 @@
     .hero-line{ width: 100%; max-width: 400px; height: 3px; background: linear-gradient(90deg, transparent, var(--acc), transparent); margin: 10px auto; border-radius: 99px; }
     .hero-sub{ font-size: 14px; letter-spacing: 1px; color: #9aa4b2; text-transform:uppercase; font-weight:600;}
     
-    main{ max-width:1100px; margin:0 auto; padding:16px; display:grid; gap:14px; grid-template-columns: 1fr; } /* Colonna singola per semplicità su mobile */
+    main{ max-width:1100px; margin:0 auto; padding:16px; display:grid; gap:14px; grid-template-columns: 1fr; } 
     @media (min-width: 768px){ main{ grid-template-columns: 1.15fr .85fr; } }
     
     .card{ background: rgba(17,19,24,.95); border:1px solid #1b1f2a; border-radius:14px; padding:16px; box-shadow: 0 10px 30px rgba(0,0,0,.3); }
@@ -46,7 +46,7 @@
     input:focus, select:focus, textarea:focus{ border-color:var(--acc); box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.1); }
     textarea{ min-height: 85px; resize:vertical; font-family:inherit; }
     
-    /* MATERIALI STYLE EXTENDED */
+    /* MATERIALI STYLE */
     .mat-input-group { display:grid; grid-template-columns: 0.5fr 0.5fr 2fr 1fr 0.5fr; gap:8px; align-items:end; background: #0d1017; padding:10px; border-radius:10px; border:1px solid #242a38; }
     @media (max-width: 600px){ .mat-input-group{ grid-template-columns: 1fr 1fr; } .mat-input-group input:nth-child(3){ grid-column: span 2; } .mat-input-group button{ grid-column: span 2; } }
     
@@ -84,8 +84,8 @@
     #printWrap .p-table td { border:1px solid #eee; padding:6px; color:#333; }
     #printWrap .p-table tr:nth-child(even) { background: #fafafa; }
 
-    #printWrap .sig-area { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 50px; }
-    #printWrap .sig-block { border: 1px solid #ccc; padding: 10px; height: 140px; position: relative; background:#fff; }
+    #printWrap .sig-area { display: grid; grid-template-columns: 1fr; gap: 30px; margin-top: 50px; } /* 1 colonna per firma singola */
+    #printWrap .sig-block { border: 1px solid #ccc; padding: 10px; height: 140px; position: relative; background:#fff; max-width: 50%; }
     #printWrap .sig-block strong { font-size: 11px; display: block; border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 5px; text-transform:uppercase; color:#666; }
     #printWrap .sig-img { max-height: 90px; max-width: 100%; display: block; margin: 0 auto; }
     
@@ -195,22 +195,6 @@
     </div>
 
     <div class="sep"></div>
-    <h3>Firma Cliente (Per Accettazione)</h3>
-    <div class="row">
-      <div><label>Nome Cliente</label><input id="clName" placeholder="Chi firma?" /></div>
-    </div>
-    <div class="sigbox" id="clSigDrawBox">
-      <canvas id="clCanvas"></canvas>
-      <button onclick="clearCanvas('clCanvas')" style="padding:4px 10px; font-size:11px;">Cancella</button>
-    </div>
-    
-    <div class="sep"></div>
-    <div class="pill" style="cursor:default">
-      <input type="checkbox" id="privacy" checked disabled />
-      <label for="privacy" style="font-size:11px; color:#888; cursor:default">Il cliente accetta l'ordine e le condizioni di vendita.</label>
-    </div>
-
-    <div class="sep"></div>
     <div class="btns">
       <button class="primary" id="finalize" style="width:100%; padding:15px;">✅ CONFERMA ORDINE</button>
       
@@ -262,16 +246,11 @@
       <div id="p_op_sig_img"></div>
       <div style="font-size:10px; margin-top:5px; text-align:center" id="p_op_name"></div>
     </div>
-    <div class="sig-block">
-      <strong>Cliente (Per Accettazione)</strong>
-      <div id="p_cl_sig_img"></div>
-      <div style="font-size:10px; margin-top:5px; text-align:center" id="p_cl_name"></div>
-    </div>
   </div>
 
   <footer>
     Mainetti Solution - Ordine Materiale (EXT).<br>
-    Documento valido come conferma d'ordine.
+    Documento interno di richiesta materiale / ordine vendita.
   </footer>
 </div>
 
@@ -282,7 +261,7 @@
 
 <script>
   if ('serviceWorker' in navigator) {
-    // Optional: window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js'));
+    // Optional
   }
 
   const STORAGE_KEY = "ms_ext_v1_data";
@@ -335,6 +314,7 @@
   const pads = {};
   function initPad(id){
     const c = $(id);
+    if(!c) return; // Safety check
     const ctx = c.getContext("2d");
     let drawing = false, storedImage = null;
     function resize(){
@@ -354,10 +334,11 @@
     pads[id] = { canvas:c, ctx:ctx, resize:resize, setImg:(img)=>{storedImage=img; resize();}, clearImg:()=>{storedImage=null;}, isEmpty:()=>!ctx.getImageData(0,0,c.width,c.height).data.some(x=>x!==0) };
     setTimeout(resize, 500);
   }
-  initPad("opCanvas"); initPad("clCanvas");
+  initPad("opCanvas"); 
+  // initPad("clCanvas") RIMOSSO
 
   window.clearCanvas = (id) => { pads[id].clearImg(); pads[id].ctx.clearRect(0,0,pads[id].canvas.width,pads[id].canvas.height); };
-  window.drawFromUrl = (id, url) => { if(!url)return; const img=new Image(); img.onload=()=>pads[id].setImg(img); img.src=url; };
+  window.drawFromUrl = (id, url) => { if(!url || !pads[id])return; const img=new Image(); img.onload=()=>pads[id].setImg(img); img.src=url; };
   function getSigData(prefix){
     return { type:"draw", val: pads[prefix+"Canvas"].canvas.toDataURL(), empty: pads[prefix+"Canvas"].isEmpty() };
   }
@@ -372,20 +353,17 @@
   }
 
   function getData(){
-    // MAPPATURA PER COMPATIBILITA CON IL TOOL DI FATTURAZIONE
-    // job.desc diventa "Note" per l'admin
-    // job.type diventa la modalità consegna
     return {
       client: { name: $("clientName").value, addr: $("address").value, contact: $("contact").value },
       job: { 
           missionId: $("missionId").value, 
           date: $("date").value, 
-          loc: "Vendita Esterna", // Fisso per riconoscerlo
+          loc: "Vendita Esterna",
           type: $("type").value, 
           desc: $("notes").value 
       },
       materials: materials,
-      result: { outcome: "Ordine Confermato", notes: "" } // Placeholder
+      result: { outcome: "Ordine Confermato", notes: "" }
     };
   }
 
@@ -400,12 +378,12 @@
   $("finalize").onclick = () => {
     const d = getData();
     if(!d.client.name || !d.job.date || materials.length === 0) return toast("Mancano dati (Cliente, Data o Materiali)!");
-    const op=getSigData("op"), cl=getSigData("cl");
+    const op=getSigData("op");
     
-    // Per vendita veloce, la firma cliente potrebbe essere opzionale se ordina via telefono, ma meglio chiedere
     if(op.empty) return toast("Firma tu come venditore!");
     
-    const rec = { id: currentId||uid(), status: "signed", timestamp: nowISO(), data: d, sigs: { op: {name:$("opName").value, ...op}, cl: {name:$("clName").value, ...cl} } };
+    // Solo firma operatore (op)
+    const rec = { id: currentId||uid(), status: "signed", timestamp: nowISO(), data: d, sigs: { op: {name:$("opName").value, ...op} } };
     const all = loadAll();
     const idx = all.findIndex(x=>x.id===rec.id);
     if(idx>=0) all[idx]=rec; else all.unshift(rec);
@@ -416,20 +394,17 @@
   $("reset").onclick = () => location.reload();
   $("exitView").onclick = () => location.reload();
 
-  // --- WHATSAPP EXPORT LOGIC ---
+  // --- WHATSAPP EXPORT LOGIC (FIXED) ---
   $("waBtn").onclick = async () => {
       const rec = loadAll().find(x=>x.id===currentId);
       if(!rec) return;
 
-      // 1. Creiamo il file JSON (Importabile nel Tool)
       const fileName = `ORDINE_${rec.data.client.name.replace(/\s/g,'_')}.json`;
-      const jsonContent = JSON.stringify([rec], null, 2); // Array per compatibilità import
+      const jsonContent = JSON.stringify([rec], null, 2);
       const file = new File([jsonContent], fileName, { type: "application/json" });
+      const text = `📦 *NUOVO ORDINE*\nCliente: ${rec.data.client.name}\nRif: ${rec.data.job.missionId}\n\nAllego il file ordine.`;
 
-      // 2. Testo messaggio
-      const text = `📦 *NUOVO ORDINE*\nCliente: ${rec.data.client.name}\nRif: ${rec.data.job.missionId}\n\nAllego il file per l'importazione nel gestionale.`;
-
-      // 3. Uso Web Share API (Mobile)
+      // 1. Tenta Condivisione Nativa (Ottima su Mobile)
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
           try {
               await navigator.share({
@@ -437,21 +412,30 @@
                   title: 'Ordine Mainetti Vision',
                   text: text
               });
+              return; // Se ha funzionato, fermati qui
           } catch (error) {
-              console.log('Sharing failed', error);
+              console.log('Share nativo fallito o annullato, provo fallback...', error);
           }
-      } else {
-          // Fallback Desktop: Scarica il file e apri WA Web
-          const a = document.createElement('a');
-          a.href = URL.createObjectURL(new Blob([jsonContent], {type:'application/json'}));
-          a.download = fileName;
-          a.click();
-          
-          toast("File Scaricato! Ora si apre WhatsApp...");
-          setTimeout(() => {
-            window.open(`https://wa.me/?text=${encodeURIComponent(text + "\n(Trascina qui il file scaricato)")}`, '_blank');
-          }, 1500);
       }
+
+      // 2. FALLBACK: Scarica e apri link (Ottimizzato per PC/Browser senza share)
+      // Scarica il file
+      const blob = new Blob([jsonContent], {type:'application/json'});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = fileName;
+      document.body.appendChild(a); 
+      a.click();
+      document.body.removeChild(a);
+      
+      toast("File scaricato! Ora si apre WhatsApp...");
+
+      // Costruisci il link WhatsApp
+      // Nota: Non è possibile allegare file via link web, l'utente deve farlo manualmente.
+      const waUrl = `https://wa.me/?text=${encodeURIComponent(text + "\n\n(⚠️ NOTA: Allega qui il file .JSON che hai appena scaricato!)")}`;
+      
+      // Usa location.href invece di window.open per evitare blocchi popup su mobile
+      window.location.href = waUrl;
   };
 
   // --- PDF GENERATION ---
@@ -481,7 +465,7 @@
         `).join("");
 
         $("p_op_name").textContent = rec.sigs.op.name; $("p_op_sig_img").innerHTML = renderSigHTML(rec.sigs.op);
-        $("p_cl_name").textContent = rec.sigs.cl.name; $("p_cl_sig_img").innerHTML = renderSigHTML(rec.sigs.cl);
+        // Firma cliente rimossa dal PDF
 
         const el = $("printWrap");
         html2canvas(el, { scale: 2 }).then(c => {
@@ -502,7 +486,7 @@
       <div class="hist-item">
         <div class="hist-info" onclick="loadRec('${r.id}')">
           <b>${r.data.client.name || "Senza nome"}</b><br>
-          <span style="font-size:11px;color:#888">${fmtDate(r.data.job.date)} - ${r.status === 'signed' ? '✅ INVIATO/CHIUSO' : '✏️ BOZZA'}</span>
+          <span style="font-size:11px;color:#888">${fmtDate(r.data.job.date)} - ${r.status === 'signed' ? '✅ CHIUSO' : '✏️ BOZZA'}</span>
         </div>
         <button class="hist-del" onclick="deleteRec('${r.id}', event)">🗑️</button>
       </div>
@@ -528,14 +512,13 @@
       $("pdfBtn").disabled = false; 
       $("waBtn").disabled = false;
       $("exitView").classList.remove("hidden");
-      const op = r.sigs.op, cl = r.sigs.cl;
+      const op = r.sigs.op;
       drawFromUrl("opCanvas", op.val);
-      drawFromUrl("clCanvas", cl.val);
     } else {
       $("pdfBtn").disabled = true; 
       $("waBtn").disabled = true;
       $("exitView").classList.add("hidden");
-      clearCanvas("opCanvas"); clearCanvas("clCanvas");
+      clearCanvas("opCanvas");
     }
   };
 
