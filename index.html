@@ -1,249 +1,270 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema di Contabilità</title>
-    <link rel="stylesheet" href="css/style.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <style>
-        .scaduta { background-color: #fff0f0; }
-        .badge-scaduta { background-color: #dc3545; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
-        .dashboard-alert { color: #dc3545; font-weight: bold; }
-        .rap-item { padding: 10px; border-bottom: 1px solid #eee; cursor: pointer; transition: background 0.2s; }
-        .rap-item:hover { background-color: #f0f8ff; }
-        .rap-date { font-size: 12px; color: #666; }
-        .rap-client { font-weight: bold; font-size: 14px; }
-        .rap-desc { font-size: 12px; font-style: italic; color: #444; }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mainetti Vision: EXT</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.png" type="image/png">
+  <meta name="theme-color" content="#0b0c10">
+  <style>
+    /* STILE EXT - TEMA ARANCIONE */
+    :root { --bg:#0b0c10; --card:#111318; --muted:#9aa4b2; --txt:#e8edf2; --acc:#f97316; }
+    *{ box-sizing:border-box; }
+    body{ margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; background:linear-gradient(180deg,#0b0c10,#0a0b0f); color:var(--txt); padding-bottom:50px; }
+    header.hero{ padding: 30px 16px 20px; border-bottom: 1px solid #1b1f2a; position: sticky; top: 0; z-index: 10; backdrop-filter: blur(10px); background: rgba(11,12,16,.9); }
+    .hero-inner{ max-width: 1100px; margin: 0 auto; text-align: center; }
+    .hero-title{ font-size: 32px; letter-spacing: 2px; font-weight: 800; text-transform: uppercase; color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+    .hero-line{ width: 100%; max-width: 400px; height: 3px; background: linear-gradient(90deg, transparent, var(--acc), transparent); margin: 10px auto; border-radius: 99px; }
+    .hero-sub{ font-size: 14px; letter-spacing: 1px; color: #9aa4b2; text-transform:uppercase; font-weight:600;}
+    main{ max-width:1100px; margin:0 auto; padding:16px; display:grid; gap:14px; grid-template-columns: 1fr; } 
+    @media (min-width: 768px){ main{ grid-template-columns: 1.15fr .85fr; } }
+    .card{ background: rgba(17,19,24,.95); border:1px solid #1b1f2a; border-radius:14px; padding:16px; box-shadow: 0 10px 30px rgba(0,0,0,.3); }
+    .card h2{ margin:0 0 15px 0; font-size:14px; text-transform:uppercase; letter-spacing:1px; color:var(--acc); border-left: 3px solid var(--acc); padding-left: 10px; }
+    .row{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    label{ display:block; font-size:12px; color:var(--muted); margin-bottom:6px; font-weight:500;}
+    input, select, textarea{ width:100%; padding:12px; border-radius:10px; border:1px solid #242a38; background:#0d1017; color:var(--txt); outline:none; font-size:14px; transition:.2s;}
+    input:focus, select:focus, textarea:focus{ border-color:var(--acc); box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.1); }
+    textarea{ min-height: 85px; resize:vertical; font-family:inherit; }
+    .mat-input-group { display:grid; grid-template-columns: 0.5fr 0.5fr 2fr 1fr 0.5fr; gap:8px; align-items:end; background: #0d1017; padding:10px; border-radius:10px; border:1px solid #242a38; }
+    .mat-list-item { display:flex; justify-content:space-between; align-items:center; padding:8px 10px; border-bottom:1px solid #242a38; background:rgba(255,255,255,0.02); margin-top:5px; border-radius:6px; font-size:13px;}
+    .mat-list-item span { color: var(--acc); font-weight:bold; margin-right:10px; }
+    .mat-price { color: #888; margin-left: auto; margin-right: 15px; font-size:12px; }
+    .sep{ height:1px; background:#1b1f2a; margin:16px 0; }
+    .btns{ display:flex; flex-wrap:wrap; gap:10px; }
+    button{ border:0; border-radius:12px; padding:12px 16px; cursor:pointer; background: #1a2233; color:var(--txt); border:1px solid #26304a; font-weight:600; font-size:14px; transition:.2s;}
+    button:hover{ filter:brightness(1.1); }
+    button.primary{ background: linear-gradient(180deg,var(--acc),#ea580c); border:none; color:#fff; box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3); }
+    button.whatsapp{ background: #25D366; border:none; color:#fff; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3); }
+    button.ok{ background: #14251f; border-color:#1f4b3c; color:#d8fff1; }
+    button.danger{ background: #2a1717; border-color:#512121; color:#ffd7d7; }
+    button.add-btn { background: var(--acc); color:#fff; font-weight:bold; height:42px;}
+    button:disabled{ opacity:.5; cursor:not-allowed; box-shadow:none; }
+    .sigbox{ display:grid; gap:10px; margin-top:10px; padding:10px; border:1px solid #242a38; border-radius:10px; background:#14161c; }
+    canvas{ width:100%; height:140px; border-radius:12px; border:1px dashed #2a3143; background:#0d1017; touch-action:none;}
+    .hidden{ display:none !important; }
+    #toast{ position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#111; border:1px solid var(--acc); padding:12px 24px; border-radius:99px; color:#fff; font-size:14px; opacity:0; transition:.3s; pointer-events:none; z-index:1000; font-weight:bold;}
+    #toast.show{ opacity:1; transform:translateX(-50%) translateY(-10px); }
+    .hist-item{ display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #222; transition:.2s; background: rgba(255,255,255,0.02); margin-bottom:6px; border-radius:8px;}
+    .hist-info{ flex-grow:1; padding:12px; cursor:pointer; }
+    .hist-del{ padding:12px 16px; cursor:pointer; font-size:16px; background:transparent; border:none; color:#666; transition:.2s; border-left:1px solid #222; border-radius:0 8px 8px 0;}
+    .power { text-align:center; font-size:11px; color:var(--muted); margin-top:20px; opacity:0.6; }
+    /* Print Styles */
+    #printWrap{ position: fixed; left: -10000px; top: 0; width: 794px; background: white; color: #333; padding: 40px; font-family: 'Segoe UI', Arial, sans-serif; }
+    #printWrap h1 { color: #111; border-bottom: 3px solid #f97316; padding-bottom: 10px; font-size: 24px; margin-bottom: 5px; text-transform: uppercase;}
+    #printWrap h3 { background: #fff7ed; padding: 6px 10px; color: #9a3412; font-size: 14px; border-left: 4px solid #f97316; margin-top: 25px; font-weight:bold; }
+    #printWrap .p-row { display: flex; margin-bottom: 8px; font-size: 12px; border-bottom: 1px solid #f0f0f0; padding-bottom: 4px; }
+    #printWrap .p-label { width: 140px; font-weight: bold; color: #444; }
+    #printWrap .p-val { flex-grow: 1; color: #000; font-family: 'Courier New', monospace; font-weight:600;}
+    #printWrap .p-table { width:100%; border-collapse: collapse; margin-top:10px; font-size:12px; }
+    #printWrap .p-table th { background: #fff7ed; border:1px solid #ccc; padding:6px; text-align:left; font-size:11px;}
+    #printWrap .p-table td { border:1px solid #eee; padding:6px; color:#333; }
+    #printWrap .p-table tr:nth-child(even) { background: #fafafa; }
+    #printWrap .sig-area { display: grid; grid-template-columns: 1fr; gap: 30px; margin-top: 50px; }
+    #printWrap .sig-block { border: 1px solid #ccc; padding: 10px; height: 140px; position: relative; background:#fff; max-width: 50%; }
+    #printWrap .sig-block strong { font-size: 11px; display: block; border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 5px; text-transform:uppercase; color:#666; }
+    #printWrap .sig-img { max-height: 90px; max-width: 100%; display: block; margin: 0 auto; }
+    #printWrap footer { margin-top: 50px; text-align: center; font-size: 10px; color: #999; border-top: 1px solid #eee; padding-top: 15px; }
+  </style>
 </head>
 <body>
-    <header>
-    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-        <h1>Sistema di Contabilità</h1>
-        <img src="img/mainetti_icon.ico" alt="Logo" style="height: 100px; margin-right: 20px;" />
+<header class="hero">
+  <div class="hero-inner"><div class="hero-title">MAINETTI VISION: EXT</div><div class="hero-line"></div><div class="hero-sub">Vendita & Ordini Materiale</div></div>
+</header>
+<main>
+  <section class="card" id="formCard">
+    <h2>1) Dati Cliente</h2>
+    <div style="margin-bottom:12px"><label>Rif. Ordine / ID Interno</label><input id="missionId" placeholder="Es: ORD-2026-001" /></div>
+    <div class="row"><div><label>Ragione Sociale / Cliente</label><input id="clientName" placeholder="Es: Rossi S.r.l." /></div><div><label>Data Ordine</label><input id="date" type="date" /></div></div>
+    <div style="margin-top:12px"><label>Indirizzo di Consegna/Sede</label><input id="address" placeholder="Via Roma 1, Milano" /></div>
+    <div style="margin-top:12px"><label>Referente / Contatto</label><input id="contact" placeholder="Nome cognome referente" /></div>
+    <div class="sep"></div>
+    <h2>2) Lista Materiali / Prodotti</h2>
+    <div class="mat-input-group">
+        <div><label>Q.tà</label><input type="number" id="matQty" placeholder="1" /></div>
+        <div><label>Unità</label><select id="matUnit"><option value="pz">pz</option><option value="ml">ml</option><option value="kg">kg</option><option value="scatole">box</option></select></div>
+        <div><label>Articolo / Descrizione</label><input id="matName" placeholder="Es: Kit Videosorveglianza..." /></div>
+        <div><label>Prezzo Unit.</label><input type="number" id="matPrice" placeholder="CHF" step="0.01" /></div>
+        <button class="add-btn" onclick="addMaterial()">+</button>
     </div>
-        <nav>
-            <ul>
-                <li><a href="#" class="active" id="nav-dashboard">Dashboard</a></li>
-                <li><a href="#" id="nav-fatture">Fatture</a></li>
-                <li><a href="#" id="nav-offerte">Offerte</a></li>
-                <li><a href="#" id="nav-clienti">Clienti</a></li>
-                <li><a href="#" id="nav-servizi">Servizi</a></li>
-                <li><a href="#" id="nav-reportistica">Reportistica</a></li>
-            </ul>
-        </nav>
-    </header>
-
-    <main>
-        <section id="dashboard" class="sezione-attiva">
-            <h2>Dashboard</h2>
-            <div class="dashboard-widgets">
-                <div class="widget">
-                    <h3>Fatture Recenti</h3>
-                    <p>Totale fatture: <span id="totale-fatture">0</span></p>
-                    <p>Da incassare: <span id="da-incassare">CHF 0.00</span></p>
-                </div>
-                <div class="widget" id="widget-scadenze" style="border-left: 4px solid #dc3545;">
-                    <h3>Allerte Scadenze</h3>
-                    <p>Fatture Scadute: <span id="fatture-scadute-count" class="dashboard-alert">0</span></p>
-                    <p>Importo a rischio: <span id="fatture-scadute-importo">CHF 0.00</span></p>
-                </div>
-                <div class="widget">
-                    <h3>Offerte Recenti</h3>
-                    <p>Totale offerte: <span id="totale-offerte">0</span></p>
-                    <p>In attesa: <span id="offerte-in-attesa">CHF 0.00</span></p>
-                </div>
-                <div class="widget">
-                    <h3>Riepilogo Annuale</h3>
-                    <p>Fatturato annuo: <span id="fatturato-annuo">CHF 0.00</span></p>
-                    <p>Ultimo aggiornamento: <span id="ultimo-aggiornamento">-</span></p>
-                </div>
-                <div class="widget">
-                    <h3>Backup Dati</h3>
-                    <button onclick="esportaBackup()">💾 Esporta Backup</button><br><br>
-                    <input type="file" onchange="importaBackup(event)" accept=".json">
-                </div>
-            </div>
-        </section>
-
-        <section id="fatture">
-            <h2>Gestione Fatture</h2>
-            <div class="azioni">
-                <button class="btn" id="btn-nuova-fattura">+ Crea Fattura</button>
-                <button class="btn" style="background-color: #4ade80; color: #000;" onclick="document.getElementById('file-import-rap').click()">📥 Importa da RAP/EXT</button>
-                <input type="file" id="file-import-rap" accept=".json" style="display: none;" onchange="gestisciImportRap(event)">
-                <input type="text" id="cerca-fattura" placeholder="Cerca fattura...">
-            </div>
-
-            <div class="tabella-container">
-                <table id="tabella-fatture">
-                    <thead><tr><th>N° Fattura</th><th>Data</th><th>Scadenza</th><th>Cliente</th><th>Importo (CHF)</th><th>Stato</th><th>Azioni</th></tr></thead>
-                    <tbody></tbody>
-                </table>
-            </div>
-
-            <div id="form-fattura" class="modal">
-                <div class="modal-content">
-                    <span class="chiudi">&times;</span>
-                    <h3>Nuova Fattura</h3>
-                    <form id="fattura-form">
-                        <div class="form-row">
-                            <div class="form-group"><label for="numero-fattura">Numero Fattura</label><input type="text" id="numero-fattura" required></div>
-                            <div class="form-group"><label for="data-fattura">Data</label><input type="date" id="data-fattura" required></div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group"><label for="cliente-fattura">Cliente</label><select id="cliente-fattura" required><option value="">Seleziona cliente...</option></select></div>
-                            <div class="form-group"><label for="stato-fattura">Stato</label><select id="stato-fattura" required><option value="Da pagare">Da pagare</option><option value="Inviata">Inviata</option><option value="Pagata">Pagata</option><option value="Annullata">Annullata</option></select></div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group" style="width: 100%;"><label for="riferimento-fattura">Riferimento (Opzionale)</label><input type="text" id="riferimento-fattura" placeholder="Es. Offerta N. 123 o Accordi verbali"></div>
-                        </div>
-                        <h4>Voci Fattura</h4>
-                        <div id="voci-fattura">
-                            <div class="voce-fattura">
-                                <div class="form-row">
-                                    <div class="form-group descrizione-group"><label>Descrizione</label><input type="text" class="descrizione" required></div>
-                                    <div class="form-group qta-group"><label>Qtà</label><input type="number" class="quantita" value="1" min="0.25" step="0.25" required></div>
-                                    <div class="form-group prezzo-group"><label>Prezzo (CHF)</label><input type="number" class="prezzo" step="0.01" min="0" required></div>
-                                    <div class="form-group sconto-group"><label>Sconto (%)</label><input type="number" class="sconto" value="0" min="0" max="100"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <button type="button" id="aggiungi-voce" class="btn-secondary">+ Aggiungi Voce</button>
-                        <div class="form-row" style="margin-top: 15px;">
-                            <div class="form-group" style="width: 100%;"><label for="concerne-fattura">Concerne</label><input type="text" id="concerne-fattura" class="form-control" placeholder="Descrizione del servizio/prodotto"></div>
-                        </div>
-                        <div class="totali">
-                            <div class="totale-riga"><span>Subtotale:</span><span id="subtotale">CHF 0.00</span></div>
-                            <div class="totale-riga"><span>IVA (%):</span><div style="display: flex; align-items: center;"><input type="number" id="iva-globale-fattura" value="0" min="0" max="100" style="width: 60px; margin-right: 10px;"><span id="totale-iva">CHF 0.00</span></div></div>
-                            <div class="totale-riga totale-finale"><span>Totale:</span><span id="totale-fattura">CHF 0.00</span></div>
-                        </div>
-                        <div class="form-row form-actions">
-                            <button type="button" class="btn-secondary annulla-form">Annulla</button>
-                            <button type="submit" class="btn salva-fattura">Salva Fattura</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </section>
-
-        <section id="offerte" style="display:none"><h2>Gestione Offerte</h2>... (Contenuto standard) ...</section>
-        <section id="clienti" style="display:none"><h2>Gestione Clienti</h2>... (Contenuto standard) ...</section>
-        <section id="servizi" style="display:none"><h2>Gestione Servizi</h2>... (Contenuto standard) ...</section>
-        <section id="reportistica" style="display:none"><h2>Reportistica</h2>... (Contenuto standard) ...</section>
-    </main>
-
-    <div id="modal-selezione-rap" class="modal">
-        <div class="modal-content" style="max-width: 500px;">
-            <span class="chiudi" onclick="document.getElementById('modal-selezione-rap').style.display='none'">&times;</span>
-            <h3>Seleziona Rapporto da Importare</h3>
-            <div id="lista-rap-container" style="max-height: 400px; overflow-y: auto;"></div>
-        </div>
+    <div style="font-size:11px; color:#666; margin-top:5px; text-align:right">* Prezzo opzionale</div>
+    <div id="materialsList" style="margin-top:10px;"></div>
+    <div class="sep"></div>
+    <h2>3) Note & Consegna</h2>
+    <div><label>Metodo Consegna / Ritiro</label><select id="type"><option value="Consegna Diretta">🚚 Consegna Diretta</option><option value="Ritiro in Sede">🏢 Ritiro in Sede</option><option value="Spedizione Corriere">📦 Spedizione Corriere</option><option value="Altro">Altro</option></select></div>
+    <div style="margin-top:12px"><label>Note Aggiuntive</label><textarea id="notes" placeholder="Note per l'amministrazione o magazzino..."></textarea></div>
+    <div class="sep"></div>
+    <div class="btns" id="editBtns"><button class="ok" id="saveDraft">💾 Salva Bozza</button><button class="danger" id="reset">❌ Pulisci</button></div>
+  </section>
+  <aside class="card">
+    <h2>Conferma Ordine</h2>
+    <h3>Firma Collaboratore / Venditore</h3>
+    <div class="row"><div><label>Nome Collaboratore</label><input id="opName" value="" placeholder="Il tuo nome" /></div></div>
+    <div class="sigbox" id="opSigDrawBox"><canvas id="opCanvas"></canvas><button onclick="clearCanvas('opCanvas')" style="padding:4px 10px; font-size:11px;">Cancella</button></div>
+    <div class="sep"></div>
+    <div class="btns">
+      <button class="primary" id="finalize" style="width:100%; padding:15px;">✅ CONFERMA ORDINE</button>
+      <button id="waBtn" disabled class="whatsapp" style="width:100%">📲 Invia Ordine a Mainetti</button>
+      <button id="pdfBtn" disabled style="width:100%">📄 Scarica PDF Ordine</button>
     </div>
+    <div class="sep"></div>
+    <h2>Storico Ordini</h2>
+    <div id="history" class="mini" style="margin-top:10px"></div>
+    <div style="margin-top:20px;"><button id="exitView" class="danger hidden" style="width:100%">Chiudi Visualizzazione</button></div>
+    <div class="power">Powered by <b>Mainetti Solution</b></div>
+  </aside>
+</main>
+<div id="toast"></div>
 
-    <footer><p>&copy; <span id="anno-corrente"></span> Sistema di Contabilità - Tutti i diritti riservati</p></footer>
+<div id="printWrap">
+  <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 2px solid #f97316; padding-bottom:10px; margin-bottom:20px;">
+     <div><h1 style="border:none; margin:0; padding:0;">ORDINE MATERIALE</h1><div style="font-size:12px; color:#666; margin-top:5px;">MAINETTI VISION: EXT - Sales Order</div></div>
+  </div>
+  <h3>1. DATI CLIENTE</h3>
+  <div class="p-row" id="p_mid_row"><div class="p-label">Rif. Ordine:</div><div class="p-val" id="p_mid"></div></div>
+  <div class="p-row"><div class="p-label">Cliente:</div><div class="p-val" id="p_client"></div></div>
+  <div class="p-row"><div class="p-label">Indirizzo:</div><div class="p-val" id="p_addr"></div></div>
+  <div class="p-row"><div class="p-label">Referente:</div><div class="p-val" id="p_contact"></div></div>
+  <div class="p-row"><div class="p-label">Data:</div><div class="p-val" id="p_date"></div></div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://unpkg.com/docx@7.1.0/build/index.js"></script>
-    
-    <script src="js/script.js"></script>
-    <script src="js/pdf_functions.js"></script>
-    <script src="js/backup_gestionale.js"></script>
-    <script src="js/servizi_predefiniti.js"></script>
-    <script src="js/qrbill_integration.js"></script>
+  <h3>2. DETTAGLIO ARTICOLI</h3>
+  <table class="p-table">
+      <thead><tr><th style="width:10%">Q.tà</th><th style="width:10%">Unità</th><th>Articolo / Descrizione</th><th style="width:15%">Prezzo Unit.</th></tr></thead>
+      <tbody id="p_materials_list"></tbody>
+  </table>
 
-    <script>
-        // Sovrascriviamo la funzione di importazione per leggere i prezzi
-        window.gestisciImportRap = function(event) {
-            const file = event.target.files[0];
-            if (!file) return;
+  <h3>3. NOTE E CONSEGNA</h3>
+  <div class="p-row"><div class="p-label">Modalità:</div><div class="p-val" id="p_type"></div></div>
+  <div class="p-row"><div class="p-label">Note:</div><div class="p-val" id="p_notes"></div></div>
 
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    let json = JSON.parse(e.target.result);
-                    // Gestisce sia array (EXT) che oggetto singolo
-                    const record = Array.isArray(json) ? json[0] : json;
-                    const d = record.data;
+  <div class="sig-area">
+    <div class="sig-block"><strong>Collaboratore Mainetti</strong><div id="p_op_sig_img"></div><div style="font-size:10px; margin-top:5px; text-align:center" id="p_op_name"></div></div>
+  </div>
 
-                    if(!d) throw new Error("Formato file non valido");
+  <footer>Mainetti Solution - Ordine Materiale (EXT).<br>Documento interno di richiesta materiale / ordine vendita.</footer>
+</div>
 
-                    // 1. Apri Modale
-                    document.getElementById('form-fattura').style.display = 'block';
-                    
-                    // 2. Compila campi base
-                    document.getElementById('data-fattura').value = d.job.date;
-                    
-                    let rif = d.job.missionId || "";
-                    if(d.client.name) rif += " - " + d.client.name;
-                    document.getElementById('riferimento-fattura').value = rif;
-                    
-                    document.getElementById('concerne-fattura').value = d.job.desc || (d.job.loc === "Vendita Esterna" ? "Fornitura Materiale" : "Intervento Tecnico");
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 
-                    // 3. Genera righe materiali CON PREZZO
-                    const container = document.getElementById('voci-fattura');
-                    container.innerHTML = ""; // Pulisce
+<script>
+  const STORAGE_KEY = "ms_ext_v1_data";
+  const $ = (id) => document.getElementById(id);
+  const toast = (msg) => { const t = $("toast"); t.textContent = msg; t.classList.add("show"); setTimeout(()=>t.classList.remove("show"), 3000); };
+  function nowISO(){ return new Date().toISOString(); }
+  function uid(){ return 'ext_' + Date.now().toString(36); }
+  function loadAll(){ try{ return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"); } catch{ return []; } }
+  function saveAll(arr){ localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); }
+  function fmtDate(iso){ if(!iso || iso.indexOf("-")===-1) return iso; const p=iso.split("-"); return `${p[2]}.${p[1]}.${p[0]}`; }
 
-                    const materials = d.materials || [];
-                    if(materials.length === 0) {
-                        alert("Nessun materiale nell'ordine!");
-                    }
+  let materials = [];
+  window.addMaterial = () => {
+      const q=$("matQty").value, u=$("matUnit").value, n=$("matName").value, p=$("matPrice").value;
+      if(!q || !n) return toast("Inserisci quantità e nome!");
+      materials.push({ q, u, n, p });
+      $("matQty").value = ""; $("matName").value = ""; $("matPrice").value = "";
+      renderMaterials();
+  }
+  window.removeMaterial = (index) => { materials.splice(index, 1); renderMaterials(); }
+  function renderMaterials() {
+      const el = $("materialsList"); el.innerHTML = "";
+      materials.forEach((m, i) => {
+          const div = document.createElement("div"); div.className = "mat-list-item";
+          const priceTxt = m.p ? `CHF ${m.p}` : "";
+          div.innerHTML = `<div><span>${m.q} ${m.u}</span> ${m.n}</div> <div class="mat-price">${priceTxt}</div> <button style="padding:4px 8px; font-size:12px; background:#2a1717; color:#ffbaba" onclick="removeMaterial(${i})">X</button>`;
+          el.appendChild(div);
+      });
+  }
 
-                    materials.forEach(mat => {
-                        const div = document.createElement('div');
-                        div.className = 'voce-fattura';
-                        
-                        // LOGICA IMPORTANTE: Se c'è 'p' (prezzo) usalo, altrimenti 0
-                        const prezzo = mat.p ? parseFloat(mat.p) : 0;
-                        const nome = mat.n + (mat.u ? ` (${mat.u})` : "");
+  // Canvas
+  const pads = {};
+  function initPad(id){
+    const c = $(id); if(!c) return; const ctx = c.getContext("2d"); let drawing = false, storedImage = null;
+    function resize(){ const r = c.getBoundingClientRect(); if(r.width===0)return; c.width=r.width; c.height=r.height; ctx.lineWidth=2; ctx.strokeStyle="#e8edf2"; if(storedImage)ctx.drawImage(storedImage,0,0,c.width,c.height); }
+    window.addEventListener("resize", resize);
+    function getPos(e){ const r=c.getBoundingClientRect(), t=e.touches?e.touches[0]:e; return { x: t.clientX - r.left, y: t.clientY - r.top }; }
+    c.addEventListener("mousedown", e => { drawing=true; ctx.beginPath(); ctx.moveTo(getPos(e).x, getPos(e).y); });
+    c.addEventListener("mousemove", e => { if(drawing){ const p=getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); }});
+    window.addEventListener("mouseup", () => drawing=false);
+    c.addEventListener("touchstart", e => { e.preventDefault(); drawing=true; ctx.beginPath(); ctx.moveTo(getPos(e).x, getPos(e).y); }, {passive:false});
+    c.addEventListener("touchmove", e => { if(drawing){ e.preventDefault(); const p=getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); }}, {passive:false});
+    pads[id] = { canvas:c, ctx:ctx, resize:resize, setImg:(img)=>{storedImage=img; resize();}, clearImg:()=>{storedImage=null;}, isEmpty:()=>!ctx.getImageData(0,0,c.width,c.height).data.some(x=>x!==0) };
+    setTimeout(resize, 500);
+  }
+  initPad("opCanvas");
+  window.clearCanvas = (id) => { pads[id].clearImg(); pads[id].ctx.clearRect(0,0,pads[id].canvas.width,pads[id].canvas.height); };
+  window.drawFromUrl = (id, url) => { if(!url || !pads[id])return; const img=new Image(); img.onload=()=>pads[id].setImg(img); img.src=url; };
+  function getSigData(prefix){ return { type:"draw", val: pads[prefix+"Canvas"].canvas.toDataURL(), empty: pads[prefix+"Canvas"].isEmpty() }; }
 
-                        div.innerHTML = `
-                            <div class="form-row">
-                                <div class="form-group descrizione-group">
-                                    <label>Descrizione</label>
-                                    <input type="text" class="descrizione" value="${nome}" required>
-                                </div>
-                                <div class="form-group qta-group">
-                                    <label>Qtà</label>
-                                    <input type="number" class="quantita" value="${mat.q}" min="0" step="0.25" required>
-                                </div>
-                                <div class="form-group prezzo-group">
-                                    <label>Prezzo (CHF)</label>
-                                    <input type="number" class="prezzo" value="${prezzo}" step="0.01" min="0" required>
-                                </div>
-                                <div class="form-group sconto-group">
-                                    <label>Sconto (%)</label>
-                                    <input type="number" class="sconto" value="0" min="0" max="100">
-                                </div>
-                                <button type="button" class="btn-remove-row" style="background:#dc3545; color:white; border:none; border-radius:4px; margin-left:5px; cursor:pointer; padding:0 10px;" onclick="this.closest('.voce-fattura').remove()">X</button>
-                            </div>
-                        `;
-                        container.appendChild(div);
-                        
-                        // Scatena evento input per aggiornare totali (se lo script originale lo ascolta)
-                        const inputP = div.querySelector('.prezzo');
-                        inputP.dispatchEvent(new Event('input', { bubbles: true }));
-                    });
+  let currentId = null;
+  function toggleForm(enable){ document.querySelectorAll("input, select, textarea, button.add-btn").forEach(el => el.disabled = !enable); $("editBtns").classList.toggle("hidden", !enable); $("finalize").classList.toggle("hidden", !enable); }
+  function getData(){
+    return {
+      client: { name: $("clientName").value, addr: $("address").value, contact: $("contact").value },
+      job: { missionId: $("missionId").value, date: $("date").value, loc: "Vendita Esterna", type: $("type").value, desc: $("notes").value },
+      materials: materials, result: { outcome: "Ordine Confermato", notes: "" }
+    };
+  }
+  $("saveDraft").onclick = () => {
+    const rec = { id: currentId||uid(), status: "draft", timestamp: nowISO(), data: getData(), sigs: {} };
+    const all = loadAll(); const idx = all.findIndex(x=>x.id===rec.id); if(idx>=0) all[idx]=rec; else all.unshift(rec);
+    saveAll(all); currentId=rec.id; renderHistory(); toast("Bozza salvata!");
+  };
+  $("finalize").onclick = () => {
+    const d = getData(); if(!d.client.name || !d.job.date || materials.length === 0) return toast("Mancano dati!");
+    const op=getSigData("op"); if(op.empty) return toast("Firma tu!");
+    const rec = { id: currentId||uid(), status: "signed", timestamp: nowISO(), data: d, sigs: { op: {name:$("opName").value, ...op} } };
+    const all = loadAll(); const idx = all.findIndex(x=>x.id===rec.id); if(idx>=0) all[idx]=rec; else all.unshift(rec);
+    saveAll(all); currentId=rec.id; renderHistory(); toast("Ordine Confermato!"); loadRec(rec.id); 
+  };
+  $("reset").onclick = () => location.reload();
+  $("exitView").onclick = () => location.reload();
 
-                    // Prova a forzare un ricalcolo simulando un click o input
-                    if(container.firstElementChild) {
-                        const inputQ = container.firstElementChild.querySelector('.quantita');
-                        if(inputQ) inputQ.dispatchEvent(new Event('input', { bubbles: true }));
-                    }
+  // --- LOGICA DIRETTA WHATSAPP NUMERO SPECIFICO ---
+  $("waBtn").onclick = () => {
+      const rec = loadAll().find(x=>x.id===currentId);
+      if(!rec) return;
 
-                    alert("Import completato! Verifica il cliente e i totali.");
+      // 1. Dati da inviare
+      const jsonString = JSON.stringify([rec]);
+      
+      // 2. Numero di telefono (Formato Internazionale Svizzero senza +)
+      const telefono = "41786622588";
 
-                } catch(err) {
-                    alert("Errore durante l'importazione: " + err.message);
-                    console.error(err);
-                }
-            };
-            reader.readAsText(file);
-            event.target.value = ''; // Reset per poter ricaricare lo stesso file
-        };
-    </script>
+      // 3. Creazione Link
+      const url = `https://wa.me/${telefono}?text=${encodeURIComponent(jsonString)}`;
+      
+      // 4. Apertura
+      window.location.href = url;
+  };
+  // -----------------------------------------------
+
+  function renderSigHTML(s){ if(!s || s.empty) return ""; return `<img src="${s.val}" class="sig-img" />`; }
+  $("pdfBtn").onclick = () => {
+        const rec = loadAll().find(x=>x.id===currentId); if(!rec) return; const d = rec.data;
+        $("p_mid").textContent = d.job.missionId || "-"; $("p_client").textContent = d.client.name; $("p_addr").textContent = d.client.addr; $("p_contact").textContent = d.client.contact || "-"; $("p_date").textContent = fmtDate(d.job.date); $("p_type").textContent = d.job.type; $("p_notes").textContent = d.job.desc || "-"; 
+        $("p_materials_list").innerHTML = (d.materials||[]).map(m => `<tr><td><b>${m.q}</b></td><td>${m.u}</td><td>${m.n}</td><td>${m.p ? 'CHF '+m.p : '-'}</td></tr>`).join("");
+        $("p_op_name").textContent = rec.sigs.op.name; $("p_op_sig_img").innerHTML = renderSigHTML(rec.sigs.op);
+        html2canvas($("printWrap"), { scale: 2 }).then(c => {
+          const pdf = new window.jspdf.jsPDF(); const w = pdf.internal.pageSize.getWidth(); const h = (c.height * w) / c.width;
+          pdf.addImage(c.toDataURL("image/png"), 'PNG', 0, 0, w, h); pdf.save(`ORDINE_${d.client.name}.pdf`);
+        });
+  };
+
+  function renderHistory(){
+    const all = loadAll(); all.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+    $("history").innerHTML = all.map(r => `<div class="hist-item"><div class="hist-info" onclick="loadRec('${r.id}')"><b>${r.data.client.name}</b><br><span style="font-size:11px;color:#888">${fmtDate(r.data.job.date)} - ${r.status === 'signed' ? '✅ CHIUSO' : '✏️ BOZZA'}</span></div><button class="hist-del" onclick="deleteRec('${r.id}', event)">🗑️</button></div>`).join("");
+  }
+  window.loadRec = (id) => {
+    const r = loadAll().find(x=>x.id===id); if(!r) return; currentId = r.id; const d = r.data;
+    $("missionId").value = d.job.missionId||""; $("clientName").value = d.client.name; $("address").value = d.client.addr; $("contact").value = d.client.contact; $("date").value = d.job.date; $("type").value = d.job.type; $("notes").value = d.job.desc; 
+    materials = d.materials || []; renderMaterials();
+    const isSigned = r.status === "signed"; toggleForm(!isSigned);
+    if(isSigned){ $("pdfBtn").disabled=false; $("waBtn").disabled=false; $("exitView").classList.remove("hidden"); drawFromUrl("opCanvas", r.sigs.op.val); }
+    else { $("pdfBtn").disabled=true; $("waBtn").disabled=true; $("exitView").classList.add("hidden"); clearCanvas("opCanvas"); }
+  };
+  window.deleteRec = (id, e) => { e.stopPropagation(); if(confirm("Eliminare?")) { saveAll(loadAll().filter(x=>x.id!==id)); renderHistory(); } };
+  (function init(){ $("date").value = new Date().toISOString().split("T")[0]; renderHistory(); })();
+</script>
 </body>
 </html>
