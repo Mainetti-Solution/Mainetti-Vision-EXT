@@ -26,7 +26,27 @@
     input, select, textarea{ width:100%; padding:12px; border-radius:10px; border:1px solid #242a38; background:#0d1017; color:var(--txt); outline:none; font-size:14px; transition:.2s;}
     input:focus, select:focus, textarea:focus{ border-color:var(--acc); box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.1); }
     textarea{ min-height: 85px; resize:vertical; font-family:inherit; }
-    .mat-input-group { display:grid; grid-template-columns: 0.5fr 0.5fr 2fr 1fr 0.5fr; gap:8px; align-items:end; background: #0d1017; padding:10px; border-radius:10px; border:1px solid #242a38; }
+    
+    /* MODIFICA GRIGLIA MATERIALI: Prima colonna (Qta) allargata */
+    .mat-input-group { 
+        display:grid; 
+        /* 0.8fr per Qta (più largo), 0.7fr Unità, 2fr Nome, 1.2fr Prezzo, 0.5fr Bottone */
+        grid-template-columns: 0.8fr 0.7fr 2fr 1.2fr 0.5fr; 
+        gap:8px; 
+        align-items:end; 
+        background: #0d1017; 
+        padding:10px; 
+        border-radius:10px; 
+        border:1px solid #242a38; 
+    }
+    /* Adattamento Mobile */
+    @media (max-width: 600px){ 
+        .mat-input-group{ grid-template-columns: 1fr 1fr; } 
+        .mat-input-group input:nth-child(3){ grid-column: span 2; } /* Nome su tutta la riga */
+        .mat-input-group input:nth-child(4){ grid-column: span 1; } /* Prezzo */
+        .mat-input-group button{ grid-column: span 1; } /* Bottone */
+    }
+    
     .mat-list-item { display:flex; justify-content:space-between; align-items:center; padding:8px 10px; border-bottom:1px solid #242a38; background:rgba(255,255,255,0.02); margin-top:5px; border-radius:6px; font-size:13px;}
     .mat-list-item span { color: var(--acc); font-weight:bold; margin-right:10px; }
     .mat-price { color: #888; margin-left: auto; margin-right: 15px; font-size:12px; }
@@ -176,7 +196,6 @@
       });
   }
 
-  // Canvas
   const pads = {};
   function initPad(id){
     const c = $(id); if(!c) return; const ctx = c.getContext("2d"); let drawing = false, storedImage = null;
@@ -220,24 +239,30 @@
   $("reset").onclick = () => location.reload();
   $("exitView").onclick = () => location.reload();
 
-  // --- LOGICA DIRETTA WHATSAPP NUMERO SPECIFICO ---
+  // --- LOGICA WHATSAPP AGGIORNATA ---
   $("waBtn").onclick = () => {
       const rec = loadAll().find(x=>x.id===currentId);
       if(!rec) return;
 
-      // 1. Dati da inviare
+      const d = rec.data;
       const jsonString = JSON.stringify([rec]);
       
-      // 2. Numero di telefono (Formato Internazionale Svizzero senza +)
+      // Costruzione del messaggio con i dati in chiaro sopra il codice
+      const messaggio = 
+`Nome cliente: "${d.client.name || ''}"
+Indirizzo: "${d.client.addr || ''}"
+
+Codice:
+${jsonString}`;
+
+      // Tuo numero
       const telefono = "41786622588";
 
-      // 3. Creazione Link
-      const url = `https://wa.me/${telefono}?text=${encodeURIComponent(jsonString)}`;
-      
-      // 4. Apertura
+      // Creazione Link e Apertura
+      const url = `https://wa.me/${telefono}?text=${encodeURIComponent(messaggio)}`;
       window.location.href = url;
   };
-  // -----------------------------------------------
+  // ------------------------------------
 
   function renderSigHTML(s){ if(!s || s.empty) return ""; return `<img src="${s.val}" class="sig-img" />`; }
   $("pdfBtn").onclick = () => {
